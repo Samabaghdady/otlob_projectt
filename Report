@@ -1,0 +1,81 @@
+package otlob_projectt;
+
+import java.util.Date;
+
+public class Report {
+    private int reportId;  
+    private int reportDate;  
+    private int productId;
+    private String productName; 
+    private double price;
+    // Constructor for generating a report
+    public Report(int productId, int reportId, double price, String productName, int reportDate) {
+        this.reportId = reportId;
+        this.productId= productId;
+        this.price=price;
+        this.productName=productName;
+        this.reportDate=reportDate;
+   
+    }
+
+    // Getter and Setter for reportId
+    public int getReportId() {
+        return reportId;
+    }
+
+    public void setReportId(int reportId) {
+        this.reportId = reportId;
+    }
+
+
+    public int getReportDate() {
+        return reportDate;
+    }
+
+    public void setReportDate(int reportDate) {
+        this.reportDate = reportDate;
+    }
+
+     public int getproductId() {
+        return productId;
+    }
+
+    public void setproductId(String reportId) {
+        this.productId = productId;
+    }
+     public String getproductName() {
+        return productName;
+    }
+
+    public void setproductName(String productName) {
+        this.productName = productName;
+    }
+     public double getprice() {
+        return price;
+    }
+
+    public void setprice(double price) {
+        this.price = price;
+    }
+
+    // Display the report details
+    public void displayReport() {
+        System.out.println("Report ID: " + reportId);
+        System.out.println("product ID: " + productId );
+        System.out.println("Product Name : " + productName);
+        System.out.println("Product Price : " + price );
+         System.out.println("Report Date: " + reportDate);
+        System.out.println("-----------------------------");
+    }
+
+    @Override
+    public String toString() {
+        return "Report{" +
+                "reportId='" + reportId + '\'' +
+                ", productId='" + productId + '\'' +
+                ", productName=" + productName +'\''+
+                ",  price =" +  price +'\'' +
+                 ", reportDate=" + reportDate +
+                '}';
+    }
+}
