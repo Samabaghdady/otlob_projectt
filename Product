@@ -1,0 +1,133 @@
+package otlob_projectt;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Product {
+
+    // Use an ArrayList for product management, as it's easy to modify (add/remove)
+    public static List<Product> products = new ArrayList<>();  // Make sure it's an ArrayList for modifications
+
+    // Attributes
+    private int productId;
+    private String productName;
+    private double price;
+    private int quantity;
+    private String description;
+    private int sellerId;
+
+    // Constructors
+    public Product(int productId, String productName, double price) {
+        this.productId = productId;
+        this.productName = productName;
+        this.price = price;
+    }
+
+    public Product(int productId, String productName, double price, int quantity, String description, int sellerId) {
+        this.productId = productId;
+        this.productName = productName;
+        this.price = price;
+        this.quantity = quantity;
+        this.description = description;
+        this.sellerId = sellerId;
+    }
+
+    // Getters and Setters
+    public int getProductId() {
+        return productId;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(int sellerId) {
+        this.sellerId = sellerId;
+    }
+
+    public boolean isInStock() {
+        return quantity > 0;
+    }
+
+    // Method to reduce the quantity when a product is sold
+    public void reduceQuantity(int amount) {
+        if (amount <= quantity) {
+            quantity -= amount;
+        } else {
+            System.out.println("Error: Not enough stock to reduce by " + amount);
+        }
+    }
+
+    // Save products to a file
+    public static void saveToFile(String filename) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
+            oos.writeObject(products); // Serialize the product list to binary
+            System.out.println("Products saved successfully in binary format.");
+        } catch (IOException e) {
+            System.err.println("Error saving products: " + e.getMessage());
+        }
+    }
+
+    // Load products from a file and update the static product list
+    public static void loadFromFile(String filename) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename))) {
+            products = (List<Product>) ois.readObject(); // Deserialize the product list from binary
+            System.out.println("Products loaded successfully.");
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error loading products: " + e.getMessage());
+        }
+    }
+
+    // Method to remove a product by ID (fixed to avoid ConcurrentModificationException)
+    public static void removeProduct(int productId) {
+        boolean productFound = false;
+        for (Product product : new ArrayList<>(products)) { // Iterate over a copy of the list
+            if (product.getProductId() == productId) {
+                products.remove(product);  // Remove the product from the list
+                System.out.println("Product with ID " + productId + " removed successfully.");
+                productFound = true;
+                break;
+            }
+        }
+        if (!productFound) {
+            System.out.println("Error: Product with ID " + productId + " not found.");
+        }
+    }
+}
