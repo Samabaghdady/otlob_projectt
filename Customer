@@ -1,0 +1,197 @@
+package otlob_projectt;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+
+class Customer extends User {
+
+    // Change to ArrayList for easier manipulation (adding/removing)
+    static List<Customer> customers = new ArrayList<>(); // Use ArrayList for customers
+     private List<Order> orderHistory = new ArrayList<>(); 
+    private int customerId;
+    private String customerName;
+    private Cart cart; 
+
+    // Constructor to create a customer with an existing cart
+    public Customer(Cart cart) {
+        super(cart.getCartID(), "defaultUsername", "defaultPassword", "defaultEmail", "Customer");
+        this.cart = cart;
+        this.customerId = cart.getCartID();  // Set customerId from the cart ID
+    }
+
+    // Main constructor for Customer
+    public Customer(int userId, String username, String password, String email) {
+        super(userId, username, password, email, "Customer");
+        this.customerId = userId;
+        this.cart = new Cart(userId); // Create a new cart for this customer
+    }
+
+    // Getter and Setter for customerId
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    // Getter and Setter for customerName
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCname(String customerName) {
+        this.customerName = customerName;
+    }
+
+    // Getter and Setter for Cart
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
+    // Add to Cart
+    public void addToCart(Product product) { 
+        if (product != null) {
+            cart.addProduct(product); 
+        } else {
+            System.out.println("Error: Cannot add null product to cart.");
+        }
+    }
+
+    // Remove from Cart
+    public void removeFromCart(int productId) { 
+        cart.removeProduct(productId);
+    }
+
+    // Add Payment and Confirm Cart
+    public void addPaymentAndConfirmCart(payment paymentMethod) {
+        if (cart.getProducts().isEmpty()) {
+            System.out.println("Error: Cannot confirm payment for an empty cart.");
+            return;
+        }
+
+        if (paymentMethod == null) {
+            System.out.println("Error: Invalid payment method.");
+            return;
+        }
+
+        // Process payment (dummy implementation)
+        boolean paymentSuccessful = paymentMethod.processPayment();
+
+        if (paymentSuccessful) {
+            System.out.println("Payment confirmed. Proceeding to checkout.");
+            checkout(paymentMethod);
+        } else {
+            System.out.println("Payment failed. Try again.");
+        }
+    }
+
+    // Cancel an order
+    public void cancelOrder(int orderId) {
+        Order orderToCancel = null;
+        for (Order order : orderHistory) {
+            if (order.getOrderId() == orderId) {
+                orderToCancel = order;
+                break;
+            }
+        }
+
+        if (orderToCancel != null) {
+            orderToCancel.setStatus(Order.OrderStatus.CANCELED); // Use the enum here
+            System.out.println("Order " + orderId + " has been successfully cancelled.");
+        } else {
+            System.out.println("Order " + orderId + " not found. Cannot cancel.");
+        }
+    }
+
+    // View Order History
+  // View a specific order by orderId
+public void viewOrder(int orderId) {
+    // Loop through the order history to find the order by its ID
+    for (Order order : orderHistory) {
+        if (order.getOrderId() == orderId) {
+            // Print order details if found
+            System.out.println("Order ID: " + order.getOrderId());
+            System.out.println("Customer ID: " + order.getCustomerId());
+            System.out.println("Seller ID: " + order.getSellerId());
+            System.out.println("Order Date: " + order.getOrderDate());
+            System.out.println("Status: " + order.getStatus());
+            System.out.println("Total Amount: $" + order.getTotalAmount());
+
+            // Print the details of the products in the order
+            System.out.println("Products in this Order:");
+            for (Order.OrderDetail detail : order.getOrderDetails()) {
+                System.out.println("- Product: " + detail.getProduct().getProductName());
+                System.out.println("  Quantity: " + detail.getQuantity());
+                System.out.println("  Price per unit: $" + detail.getPrice());
+            }
+
+            return; // Exit once the order is found and details are printed
+        }
+    }
+    System.out.println("Order with ID " + orderId + " not found.");
+}
+
+    // Checkout method
+    public void checkout(payment paymentMethod) {
+        Order order = cart.checkout(paymentMethod);
+        if (order != null) {
+            orderHistory.add(order); // Add the order to history only if successful
+            System.out.println("Order placed successfully. Order ID: " + order.getOrderId());
+        } else {
+            System.out.println("Checkout failed. Order could not be placed.");
+        }
+    }
+
+    // Track Order Status
+    public String trackOrderStatus(int orderId) {
+        for (Order order : orderHistory) {
+            if (order.getOrderId() == orderId) {
+                return "Order ID: " + orderId + " Status: " + order.getStatus();
+            }
+        }
+        return "Order ID: " + orderId + " not found.";
+    }
+
+    // Rate Order
+    public void rateOrder(int orderId, int rating) { 
+        for (Order order : orderHistory) {
+            if (order.getOrderId() == orderId) {
+                order.setRating(rating);
+                System.out.println("Order ID: " + orderId + " rated with " + rating + " stars.");
+                return;
+            }
+        }
+        System.out.println("Order ID: " + orderId + " not found. Cannot rate.");
+    }
+
+    // Static method to read customer data from a file
+    public static void readCustomerFromFile(String fileName) throws ClassNotFoundException {
+        try (ObjectInputStream fileobj = new ObjectInputStream(new FileInputStream(fileName))) {
+            Customer.customers = (ArrayList<Customer>) fileobj.readObject();
+            System.out.println("Loaded " + Customer.customers.size() + " customers.");
+        } catch (IOException e) {
+            System.out.println("An error occurred while reading the customer file: " + e.getMessage());
+        }
+    }
+
+    // Static method to save customer data to a file
+    public static void saveCustomerToFile(String fileName) {
+        try (ObjectOutputStream fileobj = new ObjectOutputStream(new FileOutputStream(fileName))) {
+            fileobj.writeObject(Customer.customers);
+        } catch (IOException e) {
+            System.out.println("An error occurred while saving the customer file: " + e.getMessage());
+        }
+    }
+
+    // Static method to remove a customer from the customers list
+    public static void removeCustomer(int customerId) {
+        customers.removeIf(customer -> customer.getCustomerId() == customerId);
+        System.out.println("Customer with ID " + customerId + " removed successfully.");
+    }
+}
