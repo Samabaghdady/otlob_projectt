@@ -1,0 +1,61 @@
+package otlob_projectt;
+import java.time.LocalDate;
+   public class visa extends payment{
+    
+    private String cardNumber;
+    private LocalDate expiryDate;
+    private int cvv  ;        
+
+    /**
+     *
+     */
+   
+    public visa(String cardNumber, LocalDate expiryDate, int cvv, float amount, LocalDate date, int orderId) {
+        super(amount, date, orderId);
+        this.cardNumber = cardNumber;
+        this.expiryDate = expiryDate;
+        this.cvv = cvv;
+    }
+
+   
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public LocalDate getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
+    public int getCvv() {
+        return cvv;
+    }
+
+    public void setCvv(int cvv) {
+        this.cvv = cvv;
+    }
+    
+     @Override
+     public  boolean processPayment(double totalAmount){
+        System.out.println("Processing Visa payment");
+        System.out.println("Card Number: " + cardNumber);
+        System.out.println("Expiry Date: " + expiryDate);
+        
+        return true;
+    } 
+
+    @Override
+    public boolean processPayment() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+         
+         
+     }
