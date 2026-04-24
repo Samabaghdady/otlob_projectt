@@ -1,0 +1,154 @@
+package otlob_projectt;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Cart {
+    
+    private int cartID;
+    private Customer customer; // Assuming you have a Customer class
+    private List<Product> products;
+
+    public Cart(int cartID) {
+        this.cartID = cartID;
+        this.products = new ArrayList<>();
+    }
+   public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public void addProduct(Product product) {
+        products.add(product);
+    }
+
+
+
+    public void removeProduct(int productId) {
+        if (products.isEmpty()) {
+            System.out.println("Error: Cart is empty.");
+            return;
+        }
+        
+        boolean productRemoved = false;
+        for (int i = 0; i < products.size(); i++) {
+            if (products.get(i).getProductId() == productId) { 
+                products.remove(i);
+                productRemoved = true;
+                System.out.println("Product removed. Total amount: $" + getTotalAmount());
+                break;
+            }
+        }
+        
+        if (!productRemoved) {
+            System.out.println("Error: Product not found in cart.");
+        }
+    }
+
+    // Calculate the total amount 
+    public double calculateTotal() {
+        double total = 0.0;
+        for (Product product : products) {
+            total += product.getPrice();
+        }
+        return total;
+    }
+
+    // Getter for total amount
+    public double getTotalAmount() {
+        return calculateTotal(); 
+    }
+
+    // Getters and Setters
+    public int getCartID() {
+        return cartID;
+    }
+
+    public void setCartID(int cartID) {
+        this.cartID = cartID;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+//    public void setCustomer(Customer customer) {
+//        this.customer = customer;
+//    }
+//
+//    public List<Product> getProducts() {
+//        return new ArrayList<>(products); 
+//    }
+    
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        if (products != null) { 
+            this.products = new ArrayList<>(products);
+            System.out.println("Products set. Total amount: $" + getTotalAmount());
+        }
+    }
+
+    public void viewCart() {
+        if (products.isEmpty()) {
+            System.out.println("Cart is empty.");
+            return;
+        }
+        
+        System.out.println("Products in cart:");
+        for (Product product : products) {
+            System.out.println("Product ID: " + product.getProductId() + ", Name: " + product.getProductName() + ", Price: $" + product.getPrice());
+        }
+        System.out.println("Total Amount: $" + getTotalAmount());
+    }
+    
+    public Order checkout(payment paymentMethod) { // Corrected parameter type
+        if (products.isEmpty()) {
+            System.out.println("Error: Cart is empty. Cannot proceed to checkout.");
+            return null;
+        }else{
+        
+        double totalAmount = getTotalAmount();
+        
+        // Attempt to process the payment
+        if (paymentMethod.processPayment(totalAmount)) {
+            
+            List<Order.OrderDetail> orderDetails = new ArrayList<>();
+            for (Product product : products) {
+                orderDetails.add(new Order.OrderDetail(product, 1)); 
+            }
+
+        }
+        return null;
+    }
+    }
+
+ public void clearCart() {
+        products.clear();
+        System.out.println("Cart has been cleared.");
+    }
+   public void saveToFile(String filename) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
+            oos.writeObject(this); // Serialize the entire Cart object
+            System.out.println("Cart saved successfully.");
+        } catch (IOException e) {
+            System.err.println("Error saving cart: " + e.getMessage());
+        }
+    }
+
+    
+    public static Cart loadFromFile(String filename) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename))) {
+            return (Cart) ois.readObject(); // Deserialize the Cart object
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error loading cart: " + e.getMessage());
+            return null;
+        }
+    }
+}
