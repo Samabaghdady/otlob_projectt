@@ -1,0 +1,126 @@
+package otlob_projectt;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import otlob_projectt.Order.OrderManager;
+
+public class Seller extends User {
+    private int sellerId;
+    private List<Product> products;
+
+    // Constructor
+    public Seller(int userId, String name, String email, String password) {
+        super(userId, name, password, email, "Seller");
+        this.sellerId = userId;
+        this.products = new ArrayList<>();
+    }
+
+    // Save Seller data to file
+    public void saveToFile(String filename) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filename)))) {
+            oos.writeObject(this);
+            System.out.println("Seller data saved successfully.");
+        } catch (IOException e) {
+            System.err.println("Error saving seller data: " + e.getMessage());
+        }
+    }
+
+    // Load Seller products from file
+    @SuppressWarnings("unchecked")
+    public void loadProductsFromFile(String filename) {
+        try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
+            List<Product> loadedProducts = (List<Product>) ois.readObject();
+            this.products = loadedProducts;
+            System.out.println("Products loaded successfully.");
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error loading products: " + e.getMessage());
+        }
+    }
+
+    // Add a product to the list
+    public void addProduct(Product product) {
+        products.add(product);
+        System.out.println("Product added successfully.");
+    }
+
+    // Edit product details
+    public void editProduct(int productId, String newName, double newPrice) {
+        for (Product product : products) {
+            if (product.getProductId() == productId) {
+                product.setProductName(newName);
+                product.setPrice(newPrice);
+                System.out.println("Product updated successfully.");
+                return;
+            }
+        }
+        System.out.println("Product not found.");
+    }
+
+    // Remove a product
+    public void removeProduct(int productId) {
+        products.removeIf(product -> product.getProductId() == productId);
+        System.out.println("Product removed successfully.");
+    }
+
+    // List all products
+    public void listProducts() {
+        for (Product product : products) {
+            System.out.println(product.getProductId() + ": " + product.getProductName() + " ($" + product.getPrice() + ")");
+        }
+    }
+// public Report(String reportId,int productId, String reportType,String productName, Date reportDate,double price, Date generateDate) {
+   
+    // View product reports
+  public List<Report> viewProductReports() {
+    List<Report> reports = new ArrayList<>();
+    int reportIdCounter = 1; 
+    for (Product product : products) {
+        
+        int reportDate = Integer.parseInt(new java.text.SimpleDateFormat("yyyyMMdd").format(new Date()));
+
+        Report report = new Report(
+            product.getProductId(),reportIdCounter++,product.getPrice(), product.getProductName(),reportDate );
+
+        reports.add(report);
+    }
+    return reports;
+}
+    // View orders related to the seller
+    public List<Order> viewOrderDetails() {
+        List<Order> sellerOrders = new ArrayList<>();
+        List<Order> allOrders = OrderManager.getAllOrders(); // Get all orders in the system
+        for (Order order : allOrders) {
+            for (Order.OrderDetail orderDetail : order.getOrderDetails()) {
+                if (orderDetail.getProduct().getSellerId() == this.sellerId) {
+                    sellerOrders.add(order); // If this order contains this seller's product
+                    break;
+                }
+            }
+        }
+        return sellerOrders;
+    }
+
+    // Change order status
+    public void changeOrderStatus(String orderId, String status) {
+        List<Order> orders = viewOrderDetails();
+        for (Order order : orders) {
+            if (String.valueOf(order.getOrderId()).equals(orderId)) {
+                try {
+                    Order.OrderStatus newStatus = Order.OrderStatus.valueOf(status.toUpperCase());
+                    order.setStatus(newStatus);
+                    System.out.println("Order ID: " + orderId + " status updated to " + status);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Error: Invalid status value.");
+                }
+                return;
+            }
+        }
+        System.out.println("Order ID: " + orderId + " not found. Cannot change status.");
+    }
+
+    public int getSellerId() {
+        return sellerId;
+    }
+}
