@@ -1,0 +1,229 @@
+package otlob_projectt;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Admin extends User implements Serializable {
+
+    public static ArrayList<Admin> ad = new ArrayList<>();
+
+    public Admin() {
+    }
+
+    int adminId;
+    String adminname;
+    String password;
+    String email;
+
+    public Admin(int adminId, String adminname, String password, String email) {
+        super(adminId, adminname, password, email, "Admin");
+        this.adminId = adminId;
+    }
+
+    // Admin management methods
+    public void addAdmin(Admin a) {
+        ad.add(a);
+        System.out.println("Admin added successfully");
+    }
+
+    public void deleteAdmin(int id) {
+        for (Admin admin : ad) {
+            if (admin.getAdminId() == id) {
+                ad.remove(admin);
+                System.out.println("Admin with id: " + id + " deleted successfully");
+                return;
+            }
+        }
+        System.out.println("This admin doesn't exist");
+    }
+
+    // User management methods
+    public void addUser(List<User> users, User user) {
+        users.add(user);
+        System.out.println(user.getUserName() + " added successfully.");
+    }
+
+    public void editUser(List<User> users, int userId, String newName, String newEmail) {
+        for (User user : users) {
+            if (user.getUserId() == userId) {
+                user.setUserName(newName);
+                user. setUserEmail(newEmail);
+                System.out.println("User updated successfully.");
+                return;
+            }
+        }
+        System.out.println("User not found.");
+    }
+
+    public void removeUser(List<User> users, int userId) {
+        users.removeIf(user -> user.getUserId() == userId);
+        System.out.println("User removed successfully.");
+    }
+
+    public void listAdmins() {
+        if (ad.isEmpty()) {
+            System.out.println("No admins available.");
+        } else {
+            System.out.println("List of Admins:");
+            for (Admin admin : ad) {
+                System.out.println("ID: " + admin.getAdminId() + ", Username: " + admin.getUserName());
+            }
+        }
+    }
+
+    public void listUsers(List<User> users) {
+        for (User user : users) {
+            System.out.println(user.getUserId() + ": " + user.getUserName() + " (" + user.getUserEmail()+ ")");
+        }
+    }
+
+    // File I/O for Admins
+    public static void readAdminFromFile(String fileName) throws ClassNotFoundException {
+        try (ObjectInputStream fileObj = new ObjectInputStream(new FileInputStream(fileName))) {
+            Admin.ad = (ArrayList<Admin>) fileObj.readObject();
+            System.out.println("Admins loaded from file. Size = " + Admin.ad.size());
+        } catch (IOException e) {
+            System.out.println("An error occurred while loading admins from file: " + e.getMessage());
+        }
+    }
+
+    public static void saveAdminToFile(String fileName) {
+        try (ObjectOutputStream fileObj = new ObjectOutputStream(new FileOutputStream(fileName))) {
+            fileObj.writeObject(Admin.ad);
+        } catch (IOException e) {
+            System.out.println("An error occurred while saving admins to file: " + e.getMessage());
+        }
+    }
+
+    // Customer management methods
+    public void addCustomer(Customer cu) {
+        if (cu != null) {
+            Customer.customers.add(cu);
+            System.out.println("Customer added successfully.");
+        } else {
+            System.out.println("Error: Cannot add null customer.");
+        }
+    }
+
+    public void deleteCustomer(int id) {
+        for (Customer customer : Customer.customers) {
+            if (customer.getCustomerId() == id) {
+                Customer.customers.remove(customer);
+                System.out.println("Customer with ID " + id + " deleted successfully.");
+                return;
+            }
+        }
+        System.out.println("Error: Customer with ID " + id + " not found.");
+    }
+
+    public void editCustomer(int id, String username, String password) {
+        for (Customer customer : Customer.customers) {
+            if (customer.getCustomerId() == id) {
+                customer.setCname(username);
+                customer.setPassword(password);
+                System.out.println("Customer details updated.");
+                return;
+            }
+        }
+        System.out.println("Error: Customer with ID " + id + " not found.");
+    }
+
+    public void listCustomers() {
+        if (Customer.customers.isEmpty()) {
+            System.out.println("No customers available.");
+        } else {
+            System.out.println("List of Customers:");
+            for (Customer customer : Customer.customers) {
+                System.out.println("ID: " + customer.getCustomerId() + ", Username: " + customer.getCustomerName());
+            }
+        }
+    }
+
+    // Product management methods
+    public void addProduct(Product p) {
+        if (p != null) {
+            Product.products.add(p);
+            System.out.println("Product added successfully.");
+        } else {
+            System.out.println("Error: Cannot add null product.");
+        }
+    }
+
+    public void deleteProduct(int id) {
+        for (Product pro : Product.products) {
+            if (pro.getProductId() == id) {
+                Product.products.remove(pro);
+                System.out.println("Product with ID " + id + " removed successfully.");
+                return;
+            }
+        }
+        System.out.println("Error: Product with ID " + id + " not found.");
+    }
+
+    public void editProduct(int id, double price) {
+        for (Product pro : Product.products) {
+            if (pro.getProductId() == id) {
+                pro.setPrice(price);
+                System.out.println("Product details updated.");
+                return;
+            }
+        }
+        System.out.println("Error: Product with ID " + id + " not found.");
+    }
+
+    public void listProducts() {
+        if (Product.products.isEmpty()) {
+            System.out.println("No products available.");
+        } else {
+            System.out.println("List of Products:");
+            for (Product pro : Product.products) {
+                System.out.println("ID: " + pro.getProductId() + ", Name: " + pro.getProductName() + ", Price: " + pro.getPrice());
+            }
+        }
+    }
+
+    // Login functionality
+    public boolean logIn(String username, String password) {
+        for (Admin add : ad) {
+            if (username.equals(add.getUserName()) && password.equals(add.getPassword())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Getter methods
+    public int getAdminId() {
+        return adminId;
+    }
+
+    public String getAdminname() {
+        return adminname;
+    }
+
+    public void setAdminname(String adminname) {
+        this.adminname = adminname;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public String toString() {
+        return "Admin{id=" + getAdminId() + ", username=" +getUserName()+ ", password=" + getPassword() + "}";
+    }
+}
