@@ -1,0 +1,201 @@
+package otlob_projectt;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class Order {
+    private int orderId;
+    private int customerId;
+    private int sellerId;
+    private List<OrderDetail> orderDetails; // Details of each product in the order
+    private OrderStatus statusEnum;
+    private double totalAmount;
+    private Date orderDate;
+    private int rating;
+
+    public enum OrderStatus {
+        PENDING, PREPARING, COMPLETED, DELIVERING, CANCELED
+    }
+
+    // Constructor
+    public Order(int orderId, int customerId, int sellerId, List<OrderDetail> orderDetails, OrderStatus statusEnum, Date orderDate) {
+        this.orderId = orderId;
+        this.customerId = customerId;
+        this.sellerId = sellerId;   
+        this.orderDetails = orderDetails != null ? new ArrayList<>(orderDetails) : new ArrayList<>(); // Initialize the list
+        this.statusEnum = statusEnum != null ? statusEnum : OrderStatus.PENDING; // Set a default status
+        this.orderDate = orderDate;
+        this.totalAmount = calculateTotal(); // Calculate total after initializing orderDetails
+    }
+ public class OrderManager {
+    private static List<Order> allOrders = new ArrayList<>();  // List to hold all orders
+
+    // Method to retrieve all orders in the system
+    public static List<Order> getAllOrders() {
+        return allOrders;  // Return the list of all orders
+    }
+
+    // Method to add an order (for demonstration)
+    public static void addOrder(Order order) {
+        allOrders.add(order);
+    }
+}
+
+    // Inner class for OrderDetail
+    public static class OrderDetail {
+        private Product product;
+        private int quantity;
+
+        public OrderDetail(Product product, int quantity) {
+            this.product = product;
+            this.quantity = quantity;
+        }
+
+        public Product getProduct() {
+            return product;
+        }
+
+        public void setProduct(Product product) {
+            this.product = product;
+        }
+
+        public int getQuantity() {
+            return quantity;
+        }
+
+        public void setQuantity(int quantity) {
+            this.quantity = quantity;
+        }
+
+        public double getPrice() {
+            return product.getPrice();
+        }
+    }
+
+    // Check if the order is deliverable
+    public boolean isDeliverable() {
+        return statusEnum == OrderStatus.DELIVERING;
+    }
+
+    // Calculate the total amount of the order
+    public double calculateTotal() {
+        double total = 0.0;
+        for (OrderDetail detail : orderDetails) {
+            total += detail.getQuantity() * detail.getPrice();
+        }
+        return total;
+    }
+
+    // Display order details
+    public void displayOrderDetails() {
+        System.out.println("Order ID: " + orderId);
+        System.out.println("Customer ID: " + customerId);
+        System.out.println("Seller ID: " + sellerId);
+        System.out.println("Order Date: " + orderDate);
+        System.out.println("Status: " + statusEnum);
+        System.out.println("Total Amount: $" + totalAmount);
+        System.out.println("Products in Order:");
+        for (OrderDetail detail : orderDetails) {
+            System.out.println("- " + detail.getProduct().getProductName() + 
+                               " | Quantity: " + detail.getQuantity() + 
+                               " | Price: $" + detail.getPrice());
+        }
+    }
+
+   public void saveToFile(String filename) {
+    try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(filename, true)))) {
+        oos.writeObject(this);
+        System.out.println("Order data saved successfully.");
+    } catch (IOException e) {
+        System.err.println("Error writing to file: " + e.getMessage());
+    }
+}
+   public static Order loadFromFile(String filename) {
+    try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(filename)))) {
+        return (Order) ois.readObject();
+    } catch (IOException | ClassNotFoundException e) {
+        System.err.println("Error loading from file: " + e.getMessage());
+        return null;
+    }
+}
+
+
+
+
+    // Getters and Setters
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
+
+    public int getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
+
+    public int getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(int sellerId) {
+        this.sellerId = sellerId;
+    }
+
+    public List<OrderDetail> getOrderDetails() {
+        return orderDetails;
+    }
+
+    public void setOrderDetails(List<OrderDetail> orderDetails) {
+        this.orderDetails = orderDetails;
+        this.totalAmount = calculateTotal();
+    }
+
+    public String getStatus() {
+        return statusEnum.name();
+    }
+
+    public void setStatus(OrderStatus statusEnum) {
+        this.statusEnum = statusEnum;
+    }
+
+    public double getTotalAmount() {
+        return totalAmount;
+    }
+
+    public Date getOrderDate() {
+        return orderDate;
+    }
+
+    public void setOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
+    }
+
+     public void setRating(int rating) {
+        if (rating >= 1 && rating <= 5) {
+            this.rating = rating;
+        } else {
+            System.out.println("Error: Rating must be between 1 and 5.");
+        }
+    }
+
+    // Method to get the rating of the order
+    public int getRating() {
+        return rating;
+    }
+}
