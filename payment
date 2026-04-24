@@ -1,0 +1,53 @@
+package otlob_projectt;   
+    import java.time.LocalDate;
+
+    public abstract class payment  {
+    
+    
+    private float amount ;
+    private LocalDate date ;
+    private int orderId;
+
+    public payment(float amount, LocalDate date, int orderId) {
+        this.amount = amount;
+        this.date = date;
+        this.orderId = orderId;
+    }
+    
+   public abstract boolean processPayment();
+   
+
+    public float getAmount() {
+        return amount;
+    }
+
+    public void setAmount(float amount) {
+        this.amount = amount;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public int getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
+
+    boolean processPayment(double totalAmount) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+    
+    
+  
+    
+    
+    
+}
