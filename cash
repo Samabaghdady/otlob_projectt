@@ -1,0 +1,20 @@
+package otlob_projectt;
+import java.time.LocalDate;
+
+ public class cash extends payment {
+
+private String receiptNumber;
+
+    public cash(String receiptNumber, float amount, LocalDate date, int orderId) {
+        super(amount, date, orderId);
+        this.receiptNumber = receiptNumber;
+    }
+ @Override
+  public  boolean processPayment(){   
+        System.out.println("Processing cash payment");
+        System.out.println("Receipt Number: " + receiptNumber);
+        return true;
+    }
+    
+    
+}
